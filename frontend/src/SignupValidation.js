@@ -1,5 +1,5 @@
 
-function Validation(values) {
+function SignupValidation(values) {
     let errors = {};
 
     const email_pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -15,7 +15,16 @@ function Validation(values) {
     } else if (!password_pattern.test(values.password)) {
         errors.password = "Password should be 6-16 characters and include at least one special character and number!";
     }
+    if(!values.confirm_password) {
+        errors.confirm_password = "Confirm Password is required";
+    } else if (values.password !== values.confirm_password) {
+        errors.confirm_password = "Passwords do not match!";
+    }
+    if(!values.name) {
+        errors.name = "Name is required";
+    }
     return errors;
+
 }
 
-export default Validation;
+export default SignupValidation;
