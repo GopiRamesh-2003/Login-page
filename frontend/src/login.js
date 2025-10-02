@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Validation from './LoginValidation';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from "react-router-dom";
+import axios from 'axios';
 
 function Login() {
     const [errors, setErrors] = useState({});
@@ -8,14 +9,48 @@ function Login() {
         email: '',
         password: ''
     });
+    const navigate = useNavigate();
 
     function handleInput(event) {
         setValues((prev) => ({ ...prev, [event.target.name]: event.target.value }));
     }
 
     const handleSubmit = (event) => {
+        console.log(values);
         event.preventDefault();
-        setErrors(Validation(values));
+        const errr = (Validation(values));
+        setErrors(errr);
+        
+        console.log(errr);
+        console.log(errors);
+
+        if (errr.email === "" && errr.password === "") {
+            console.log("No errors, submit form");
+            axios.post('http://localhost:8081/login', values)
+                .then(res => {
+                    
+                    if( res.data === "User not found") {
+                        console.log("User not found");
+                        alert("User not found. Please sign up first.");
+                        return;
+                    }
+                    else if( res.data === "Incorrect password") {
+                        console.log("Incorrect password");
+                        alert("Incorrect password. Please try again.");
+                        return;
+                    }
+                    else{
+                        console.log("Login successful");
+                        console.log(res.data);
+                        alert("Login successful!");
+                        navigate("/home"); // Navigate to home or dashboard after successful login
+
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+
+        // Handle form submission logic here
     }
 
     return (
