@@ -1,6 +1,8 @@
 import React, {useState} from 'react'
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+
 import SignupValidation from "./SignupValidation";
+import axios from 'axios';
 
 function Signup() { 
     const[values, setValues] = useState({
@@ -9,6 +11,8 @@ function Signup() {
         password: '',
         confirm_password: ''
     });
+    const navigate = useNavigate();
+
     const [errors, setErrors] = useState({});
 
     const handleInput = (event) => {
@@ -16,8 +20,24 @@ function Signup() {
     }   
 
     const handleSubmit = (event) => {
+        console.log(values);
         event.preventDefault();
-        setErrors(SignupValidation(values));
+        const errr = (SignupValidation(values));
+        setErrors(errr);
+
+        console.log(errr);
+        console.log(errors);
+        if(errr.name === "" && errr.email === "" && errr.password === "" ){
+            console.log("No errors, submit form");
+            axios.post('http://localhost:8081/signup', values)
+            .then(res => {
+                // console.log(res);
+                console.log("Posted");
+                navigate("/login");
+            })
+            .catch(err => console.log(err));
+        }
+
         // Handle form submission logic here
     }
 
@@ -46,13 +66,13 @@ function Signup() {
             className='form-control rounded-0'/>
             {errors.password && <span className='text-danger'>{errors.password}</span>}
           </div>
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <label htmlFor="password"><strong>Confirm Password</strong></label>
             <input type="password" placeholder="Re-Enter Password" name="confirm_password"
             onChange = {handleInput}
             className='form-control rounded-0'/>
             {errors.confirm_password && <span className='text-danger'>{errors.confirm_password}</span>}
-          </div>
+          </div> */}
           <button type = "submit" className="btn btn-success w-100"><strong>Sign up</strong></button>
           <p>You are agree to our terms and policies</p>
           <Link to="/login" className="btn btn-success w-100 text-decoration-non">Login</Link>
